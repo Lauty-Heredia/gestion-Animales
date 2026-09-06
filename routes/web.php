@@ -4,8 +4,10 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnimalController;
 
+
 // Ruta para listar los animales
 Route::get('/animales', [AnimalController::class, 'index']);
+Route::post('/animales', [AnimalController::class, 'store']);
 
 Route::get('/', function () {
     return view('welcome');
