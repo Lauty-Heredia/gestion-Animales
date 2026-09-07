@@ -3,6 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnimalController;
+Route::get('/animales/{id}/edit', [AnimalController::class, 'edit']); 
+Route::put('/animales/{id}', [AnimalController::class, 'update']); // Procesa la actualización de registros existentes
+Route::delete('/animales/{id}', [AnimalController::class, 'destroy']); // Procesa la eliminación de registros de la lista
 
 
 // Ruta para listar los animales
