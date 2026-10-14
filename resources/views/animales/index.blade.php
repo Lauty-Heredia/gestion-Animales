@@ -4,21 +4,38 @@
     <div class="form-container">
         <h2>Agregar Nuevo Animal</h2>
         <!-- POST para procesar el almacenamiento de nuevos registros -->
-        <form action="/animales" method="POST">
+        <form action="/" method="POST">
             @csrf <!-- Protección obligatoria para envío de datos -->
             
             <div class="form-group">
                 <label for="nombre">Nombre:</label>
-                <input type="text" name="nombre" required>
+                <input type="text" name="nombre" value="{{ old('nombre') }}" required>
+                @error('nombre')
+                    <div class="error">{{ $message }}</div>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="especie">Especie:</label>
-                <input type="text" name="especie" required>
+                <input type="text" name="especie" value="{{ old('especie') }}" required>
+                @error('especie')
+                    <div class="error">{{ $message }}</div>
+                @enderror
+            </div>
+             <div class="form-group">
+                <label for="edad">Edad:</label>
+                <input type="text" name="edad" value="{{ old('edad') }}" required>
+                @error('edad')
+                    <div class="error">{{ $message }}</div>
+                @enderror
             </div>
             <button type="submit">Guardar</button>
         </form>
     </div>
-
+    <div>
+        <form action="/reset" method="POST">
+            @csrf
+            <button type="submit" onclick="return confirm('¿Estás seguro de que deseas reiniciar la sesion de animales?')">Reiniciar Sesión</button>
+        </form>
     <h2>Lista de Animales</h2>
     <table>
         <thead>
@@ -26,6 +43,7 @@
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Especie</th>
+                <th>Edad</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -36,11 +54,12 @@
                     <td>{{ $id }}</td>
                     <td>{{ $animal['nombre'] }}</td>
                     <td>{{ $animal['especie'] }}</td>
+                    <td>{{ $animal['edad'] }}</td>
                     <td>
-                        <a href="/animales/{{ $id }}/edit">Editar</a>
+                        <a href="/{{ $id }}/edit">Editar</a>
                         
                         <!-- DELETE para eliminar registros de la lista -->
-                        <form action="/animales/{{ $id }}" method="POST" style="display:inline;">
+                        <form action="/{{ $id }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE') <!-- Directiva explícita de eliminación[cite -->
                             <button type="submit" onclick="return confirm('¿Borrar animal?')">Eliminar</button>

@@ -3,75 +3,58 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Contracts\AnimalServiceInterface;
+use App\Http\Requests\AnimalDataRequest;
 
 class AnimalController extends Controller
 {
+    public function __construct(
+        private AnimalServiceInterface $animalService
+    ){}
+
     public function index()
     {
-        $animales = session('animales', []);
-        
-        return view('animales.index', compact('animales'));
+        return view('animales.index', ['animales' => $this->animalService->all()]);
     }
 
-    public function store(Request $request)
+    public function create()
     {
-        // Recuperaramos la lista actual
-        $animales = session('animales', []);
-        
-        // Generamos un ID
-        $nuevoId = count($animales) > 0 ? max(array_keys($animales)) + 1 : 1;
-        
-        // Agregamos el unevo animal
-        $animales[$nuevoId] = [
-            'nombre' => $request->input('nombre'),
-            'especie' => $request->input('especie')
-        ];
-        
-        // Sobrescribimos la sesión con la lista actualizada
-        session(['animales' => $animales]);
-        
-        return redirect('/animales');
+        return view('animales.create');
     }
 
-    public function edit($id)
+    public function store(AnimalDataRequest $request)
     {
-        $animales = session('animales', []);
-        
-        // Si el ID no existe en la sesión, volvemos a la lista
-        if (!isset($animales[$id])) {
-            return redirect('/animales');
+        $validatedData = $request->validated();
+        $this->animalService->create($validatedData);
+        return redirect()->route('index');
+    }
+
+    public function edit(string $id)
+    {
+        $animal = $this->animalService->find($id);
+        if (!$animal) {
+            return redirect()->route('index');
         }
-        
-        $animal = $animales[$id];
         return view('animales.edit', compact('animal', 'id'));
     }
 
-    public function update(Request $request, $id)
+    public function update(AnimalDataRequest $request, string $id)
     {
-        $animales = session('animales', []);
-        
-        if (isset($animales[$id])) {
-            $animales[$id]['nombre'] = $request->input('nombre');
-            $animales[$id]['especie'] = $request->input('especie');
-            
-            // Guardamos el arreglo actualizado en la sesión
-            session(['animales' => $animales]);
-        }
-        
-        return redirect('/animales');
+        $validatedData = $request->validated();
+        $this->animalService->update($id, $validatedData);
+        return redirect()->route('index');
     }
 
-    public function destroy($id)
+    public function destroy(string $id)
     {
-        $animales = session('animales', []);
-        
-        if (isset($animales[$id])) {
-            // Eliminamos el registro del arreglo
-            unset($animales[$id]); 
-            session(['animales' => $animales]);
-        }
-        
-        return redirect('/animales');
+        $this->animalService->delete($id);
+        return redirect()->route('index');
     }
+
+    public function reset()
+    {
+        $this->animalService->reset();
+        return redirect()->route('index');
+    }
+
 }
-
